@@ -1,6 +1,6 @@
 %% Function of serotonin neuron firing.
 %Commented functions are different firing paradigms. 
-% UNITS IN events/h. 
+% UNITS of f() in events/h, time variables in seconds. 
 
 function f = fireht(t, i_factor) %Repeated stim. 
 n=length(t);
@@ -12,7 +12,7 @@ t_end = 15;
 basal = 1;
 b = 2;
 max_f = 2;
-stim_boolean = 1;
+stim_boolean = 0;
 
 if stim_boolean == 0
     for i=1:n

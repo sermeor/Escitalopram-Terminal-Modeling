@@ -4,6 +4,6 @@
 % UNITS IN uM. 
 function a = inhibR5HTto5HT(b, c)
 min_a = 0;
-a = 1 - (1).*(b - c);  %3.5
+a = 1 - (1.5).*(b - c);  %3.5
 a(a<min_a) = min_a;
 end 

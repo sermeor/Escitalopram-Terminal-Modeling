@@ -4,23 +4,26 @@ dy=zeros(48,1);
 
 %% Pharmacokinetic model
 % Rates between comparments. 
-k01p = 0.6;
-k10p = 3;
-k12p = 9.9;
-k21p = 2910;
-k13p = 6;
-k31p = 0.6;
+k01p = (1)*0.6;
+k10p = (1)*3;
+k12p = (1)*9.9;
+k21p = (1)*2910;
+k13p = (1)*6;
+k31p = (1)*0.6;
+
+
 %Parameters.
 protein_binding = 0.56;
 sert_binding = 0.15;
 
-q0 = start_SSRI(t, SSRI_start_time).*y(23); %Peritoneum concentration in ug.
+
+q0 = y(23).*start_SSRI(t, SSRI_start_time); %Peritoneum concentration in ug.
 q1 = y(24); %Blood concentration in ug.
 q2 = y(25); %Brain concentration in ug.
 q3 = y(26); %Periphery concentration in ug. 
 
 % Diff. equations. 
-dy(23) = -k01p*(q0);
+dy(23) = - k01p*(q0);
 dy(24) = k01p*(q0) - (k10p + k12p)*(q1*(1-protein_binding)) + k21p*(q2*(1-sert_binding)) - k13p*(q1*(1-protein_binding)) + k31p*(q3);
 dy(25) = k12p*(q1*(1-protein_binding)) - k21p*(q2*(1-sert_binding));
 dy(26) = k13p*(q1*(1-protein_binding)) - k31p*(q3);
@@ -30,7 +33,7 @@ dy(26) = k13p*(q1*(1-protein_binding)) - k31p*(q3);
 %% Serotonin Terminal Model
 NADP = 26;  % NADP concentration in uM.
 NADPH = 330;    % NADPH concentration in uM. 
-a8 = 5; %Strength of btrp stabilization. 
+a8 = 5; %Strength of btrp stabilization.  
 a9 = 20;    %bound auto produce G5ht*                
 a10 = 200;  %T5ht* reverses G5ht* to G5ht.                  
 a11 = 30;   %G5ht* produces T5ht*                     
@@ -65,8 +68,8 @@ ssri = (q2/v2)*1000/(molecular_weight); % SSRI concentration from compartmental 
 %Parameters for SERT membrane, inactivity and pool transport.
 k_ps = 10 .* k_5ht1ab_rel_ps(y(12), gstar_5ht_basal);
 k_sp = 10 .* k_5ht1ab_rel_sp(y(12), gstar_5ht_basal);
-k_si = 7.5 .*  k_ssri_reupt(ssri);
-k_is = 0.75;
+k_si = (1)*7.5 .*  k_ssri_reupt(ssri);
+k_is = (1)*0.75;
 
 
 %Equation parameters. 
