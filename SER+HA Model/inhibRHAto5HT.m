@@ -5,6 +5,6 @@
 function a = inhibRHAto5HT(b, c)
 min_a = 0;
 %b = gha*
-a = 1 - (1).*(b - c); %3
+a = 1 - (4).*(b - c); %3
 a(a<min_a) = min_a;
 end 

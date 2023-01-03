@@ -1,6 +1,6 @@
 %% Function with the system of differential equations for 5-HT+HA varicosities.
 function dy=msc(t, y, molecular_weight, v2, SSRI_start_time, mc_switch, mc_start_time, btrp0, eht_basal, gstar_5ht_basal, gstar_ha_basal, bht0,vht_basal)
-dy=zeros(49,1);
+dy=zeros(48,1);
 
 %% Pharmacokinetic model
 % Rates between comparments. 
@@ -35,9 +35,8 @@ a9 = 20;    %bound auto produce G5ht*
 a10 = 200;  %T5ht* reverses G5ht* to G5ht.                  
 a11 = 30;   %G5ht* produces T5ht*                     
 a12 = 200;  %decay of T5ht*.                
-a13 = 36;% rate eht bounding to receptors.                       
-a14 = 20;% rate of 5ht unbonding from autoreceptor. 
-
+a13 = (1)*36;% rate eht bounding to receptors.                       
+a14 = (1)*20;% rate of 5ht unbonding from autoreceptor. 
 g0 = 10; % total g-protein of serotonin autoreceptors.                           
 t0 = 10; % total Twas your regulary protein of serotonin autoreceptors.                           
 b0 = 10; % total serotonin autoreceptors.  
@@ -49,7 +48,9 @@ a19 = 2;  %removal of trp
 a20 = 1;   %removal of pool
 a21 = 40;  %eht removal rate.
 a22 = 1; % rate of vht_reserve moving to vht.
-a23 = 1.89; %Release constant. 
+a23 = (1)*1.89; %Release constant. 
+a24 = (1)*1; % VMAT constant.  
+a25 = (1)*1; % VSERT constant.
 k11 = 100;  %bound auto produce Gha*.
 k12 = 961.094;   %Tha* reverses Gha* to Gha.
 k13 = 20;  %Gha* produces THA*.
@@ -96,10 +97,10 @@ dy(2) = inhibsyn5HTto5HT(y(12), gstar_5ht_basal).*VTPH(y(4),y(3)) - VDRR(y(2), N
 dy(3) = VDRR(y(2),NADPH,y(3),NADP) - inhibsyn5HTto5HT(y(12), gstar_5ht_basal).*VTPH(y(4),y(3));
 dy(4) = VTRPin(y(1)) - inhibsyn5HTto5HT(y(12), gstar_5ht_basal).*VTPH(y(4),y(3)) - VPOOL(y(4),y(11)) - a19*y(4);
 dy(5) = inhibsyn5HTto5HT(y(12), gstar_5ht_basal).*VTPH(y(4),y(3)) - VAADC(y(5));
-dy(6) = VAADC(y(5)) - VMAT(y(6),y(7)) + VSERT(y(9), y(20), ssri) - TCcatab(y(6)) - a15.*(y(6) - y(9));
-dy(7) = VMAT(y(6),y(7)) - a23.*fireht(t, inhibR5HTto5HT(y(12), gstar_5ht_basal).*inhibRHAto5HT(y(16), gstar_ha_basal)).*y(7) + vht_trafficking(y(7), vht_basal);
-dy(8) = VMAT(y(6),y(8)) - a22.*vht_trafficking(y(7), vht_basal);
-dy(9) = a23.*fireht(t, inhibR5HTto5HT(y(12), gstar_5ht_basal).*inhibRHAto5HT(y(16), gstar_ha_basal)).*y(7) - VSERT(y(9), y(20), ssri) - a18.*H1ht(y(9), eht_basal).*VUP2(y(9)) - a21.*y(9) + a15.*(y(6) - y(9)) + a16.*(y(15) - y(9));
+dy(6) = VAADC(y(5)) - a24.*VMAT(y(6),y(7)) + a25.*VSERT(y(9), y(20), ssri) - TCcatab(y(6)) - a15.*(y(6) - y(9));
+dy(7) = a24.*VMAT(y(6),y(7)) - a23.*fireht(t, inhibR5HTto5HT(y(12), gstar_5ht_basal).*inhibRHAto5HT(y(16), gstar_ha_basal)).*y(7) + vht_trafficking(y(7), vht_basal);
+dy(8) = a24.*VMAT(y(6),y(8)) - a22.*vht_trafficking(y(7), vht_basal);
+dy(9) = a23.*fireht(t, inhibR5HTto5HT(y(12), gstar_5ht_basal).*inhibRHAto5HT(y(16), gstar_ha_basal)).*y(7) - a25.*VSERT(y(9), y(20), ssri) - a18.*H1ht(y(9), eht_basal).*VUP2(y(9)) - a21.*y(9) + a15.*(y(6) - y(9)) + a16.*(y(15) - y(9));
 dy(10) = TCcatab(y(6)) +  TCcatab(y(15)) - a17.*y(10);
 dy(11) = VPOOL(y(4),y(11)) - a20.*y(11);
 dy(12)  = (a9.*y(14).^2.*(g0 - y(12)) - a10.*y(13).*y(12));
@@ -209,11 +210,4 @@ dy(45) = VMATHmc(y(44), y(45)) - inhibRHAtoHA(y(46), gstar_ha_basal).*degran_ha_
 dy(46) = e4.*y(48).^2.*(g0Hmc - y(46)) - e5.*y(47).*y(46);
 dy(47) = (e6.*y(46).^2.*(t0Hmc - y(47))  - e7.*y(47));
 dy(48) = (e8.*y(29).*(b0Hmc - y(48)) - e9.*y(48));
-
-% Electrode diffusion modelling --TESTING
-%y(49) = electrode eht. 
-k000 = 10000;
-k001 = 10000;
-dy(49) = k000*y(9) - k001*y(49);
-
 end

@@ -4,6 +4,7 @@
 % Units in uM. 
 function a = inhibRHAtoHA(b, c)
 min_a = 0; 
-a = 1 - (1).*(b - c);    
+a = 1 - (2).*(b - c);    
 a(a<min_a) = min_a;
 end 
+%Fitted

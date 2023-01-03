@@ -4,7 +4,7 @@
 
 function f = fireht(t, i_factor) %Repeated stim. 
 n=length(t);
-r = 3; 
+r = 15; 
 repeat_time = 60*10;
 t_start = 5;
 t_flip = 7; 
@@ -16,7 +16,7 @@ stim_boolean = 1;
 
 if stim_boolean == 0
     for i=1:n
-        f(i) = basal.*i_factor;
+        f(i) = basal.*i_factor(i);
     end
     f(f>max_f) = max_f;
    return

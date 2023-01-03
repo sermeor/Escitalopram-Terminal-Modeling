@@ -4,7 +4,7 @@ clear all;
 
 %% Parameters for computation
 t_factor = 3600; % Time factor for graphs.
-time = 5*3600/t_factor; % Time of simulation depending on t_factor.
+time = 2*3600/t_factor; % Time of simulation depending on t_factor.
 sampling_rate = 10*t_factor; % number of samples per time factor units.
 time_array = linspace(0, time, time * sampling_rate + 1);
 
@@ -47,17 +47,17 @@ vht_basal = 63.0457; % vesicular 5ht.
 
 
 %% Model Solving. 
-[T,Y] = ode45(@msc, time_array, [95.9766 0.0993	0.9007	20.166	1.6065	0.0367	63.0457 300	0.0593	1.6028	113.4370	0.8573	0.9931	0.9650	0.0014	0.7221	1.3593	1.0084	0.2500 1.0037 	0.2463	0	dose*bioavailability	0	0	0	3.1968	140.3708	1.4717	2.0490	99.7316	247.6260	309.5325	0.7221	1.3593	1.00584	0.8573	0.9931	0.9650	354.6656	177.3328	350	150	3	140	0.7205	1.3539	1.0051 0.0593],[], molecular_weight, v2, SSRI_start_time, mc_switch, mc_start_time, btrp0, eht_basal, gstar_5ht_basal, gstar_ha_basal, bht0, vht_basal);
+[T,Y] = ode45(@msc, time_array, [95.9766 0.0993	0.9007	20.166	1.6065	0.0367	63.0457 300	0.0593	1.6028	113.4370	0.8573	0.9931	0.9650	0.0014	0.7221	1.3593	1.0084	0.2500 1.0037 	0.2463	0	dose*bioavailability	0	0	0	3.1968	140.3708	1.4717	2.0490	99.7316	247.6260	309.5325	0.7221	1.3593	1.00584	0.8573	0.9931	0.9650	354.6656	177.3328	350	150	3	140	0.7205	1.3539	1.0051],[], molecular_weight, v2, SSRI_start_time, mc_switch, mc_start_time, btrp0, eht_basal, gstar_5ht_basal, gstar_ha_basal, bht0, vht_basal);
 
 
 
 %% Extracting and calculating parameters. 
 %Getting the ssri array in concentration.
-ssri_array = (Y(:,23)/v2)*1000/molecular_weight; % uM. 
+ssri_array = (Y(:,25)/v2)*1000/molecular_weight; % uM. 
 
 %% Plotting of results. 
 figure;
-plot(T.*t_factor, 1000.*Y(:,9),'g','LineWidth',3);
+plot(T.*t_factor, 1000.*Y(:,9),'LineWidth',3);
 leg1=legend('eht');
 set(leg1,'FontSize',14);
 xlabel('Time');

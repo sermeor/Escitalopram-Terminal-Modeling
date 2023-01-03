@@ -4,6 +4,6 @@
 % Units in uM. 
 function a = inhibR5HTtoHA(b, c)
 min_a = 0;
-a = 1 + (1).*(b - c); %3
+a = 1 + (4).*(b - c); %3
 a(a<min_a) = min_a;
 end
