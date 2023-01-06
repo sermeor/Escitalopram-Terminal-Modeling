@@ -1,6 +1,6 @@
 %% Function with the system of differential equations for 5-HT+HA varicosities.
-function dy=msc(t, y, molecular_weight, v2, SSRI_start_time, SSRI_repeat_time, q_inj, mc_switch, mc_start_time, btrp0, eht_basal, gstar_5ht_basal, gstar_ha_basal, bht0,vht_basal)
-dy=zeros(48,1);
+function dy=msc(t, y, molecular_weight, v2, SSRI_start_time, SSRI_repeat_time, q_inj, mc_switch, mc_start_time, btrp0, eht_basal, gstar_5ht_basal, gstar_ha_basal, bht0, vht_basal, vha_basal)
+dy=zeros(49,1);
 
 %% Pharmacokinetic model
 % Rates between comparments. 
@@ -87,11 +87,11 @@ k_is = (1)*0.75;
 % y(13) = tstar
 % y(14) = bound
 % y(15) =  glialht
-%  y(16) =  Gha*
-%  y(17) = Tha*
-%  y(18) = bound ha
-% y(20) = SERTs_surface
+% y(16) =  Gha*
+% y(17) = Tha*
+% y(18) = bound ha
 % y(19) = SERT_surface_phospho
+% y(20) = SERTs_surface
 % y(21) = SERT_pool
 % y(22) = SERT inactive
 dy(1) = TRPin(t) - VTRPin(y(1)) - a8.*(y(1) - btrp0); 
@@ -111,7 +111,7 @@ dy(14) = (a13.*y(9).*(b0 - y(14))  - a14.*y(14));
 dy(15) = a18*H1ht(y(9), eht_basal).*VUP2(y(9))  - TCcatab(y(15)) - a16.*(y(15) - y(9));
 dy(16) = (k11.*y(18).^2.*(gh0 - y(16)) - k12.*y(17).*y(16));
 dy(17) = (k13.*y(16).^2.*(th0 - y(17))  - k14.*y(17));
-dy(18) = (k15.*y(29).*(bh0 - y(18))  - k16.*y(18));
+dy(18) = (k15.*y(30).*(bh0 - y(18))  - k16.*y(18));
 dy(19) = k_ps .* y(21) - k_sp .*y(19);
 dy(20) = dy(19) - k_si .* y(20) + k_is .* y(22);
 dy(21) = k_sp .* y(19)  - k_ps .* y(21);
@@ -130,6 +130,8 @@ b9 = 1;  %From gHT to gHTpool.
 b10 = 1; %From gHTpool to gHT.  
 b11 = 1; %Removal of gHT or use somewhere else. 
 b12 = 200; %Factor of mast cell activation of glia histamine production. 
+b13 = 1; % rate of vha_reserve moving to vha.
+
 c9 = 100; %Bound autoreceptors produceG∗. 
 c10 = 961.094; %T∗ facilitates the reversion of G∗ to G. 
 c11 = 20; %G∗ produces T∗. 
@@ -151,46 +153,48 @@ b05ht = 10; % total serotonin receptors in histamine varicosities.
 
 % y(27) = cha
 % y(28) = vha 
-% y(29) = eha
-% y(30) = gha 
-% y(31) = bht 
-% y(32) = cht 
-% y(33) = chtpool 
-% y(34) = gstar 
-% y(35) = tstar 
-% y(36) = bound 
-% y(37) = gstar5ht 
-% y(38) = tstar5ht 
-% y(39) = bound5ht 
-% y(40) = ght
-% y(41) = ghtpool
+% y(29) = vha_reserve
+% y(30) = eha
+% y(31) = gha 
+% y(32) = bht 
+% y(33) = cht 
+% y(34) = chtpool 
+% y(35) = gstar 
+% y(36) = tstar 
+% y(37) = bound 
+% y(38) = gstar5ht 
+% y(39) = tstar5ht 
+% y(40) = bound5ht 
+% y(41) = ght
+% y(42) = ghtpool
 
-dy(27) = inhibsynHAtoHA(y(34), gstar_ha_basal) .* VHTDC(y(32))  - VMATH(y(27),y(28)) -  VHNMT(y(27)) - b1*(y(27) - y(29)) + VHAT(y(29));
-dy(28) = VMATH(y(27),y(28)) - fireha(t, inhibRHAtoHA(y(34), gstar_ha_basal).*inhibR5HTtoHA(y(37), gstar_5ht_basal)).*b2.*y(28);
-dy(29) = fireha(t, inhibRHAtoHA(y(34), gstar_ha_basal).*inhibR5HTtoHA(y(37), gstar_5ht_basal)).*b2.*y(28) - VHAT(y(29)) + b3.*(y(30) - y(29)) + b1.*(y(27) - y(29)) - H1ha(y(29)).*VHATg(y(29)) - b4.*y(29) - mc_activation(t, mc_switch, mc_start_time) .* VHATmc(y(29)) + inhibRHAtoHA(y(46), gstar_ha_basal).*degran_ha_mc(mc_activation(t, mc_switch, mc_start_time));
-dy(30) = H1ha(y(29)).*VHATg(y(29)) - b3.*(y(30) - y(29)) - VHNMTg(y(30)) + (1 + b12*mc_activation(t, mc_switch, mc_start_time))*VHTDCg(y(40));
-dy(31) = HTin(t) - VHTL(y(31)) - VHTLg(y(31)) - b5.*(y(31) - bht0) - mc_activation(t, mc_switch, mc_start_time).*VHTLmc(y(31)); 
-dy(32) = VHTL(y(31)) - inhibsynHAtoHA(y(34), gstar_ha_basal) .* VHTDC(y(32)) - b6.*y(32) + b7.*y(33);
-dy(33) = (b6.*y(32) - b7.*y(33) - b8.*y(33));
-dy(34)  = (c9.*y(36).^2.*(g0HH - y(34)) - c10.*y(35).*y(34));
-dy(35) = (c11.*y(34).^2.*(t0HH - y(35))  - c12.*y(35));
-dy(36) = (c13.*y(29).*(b0HH - y(36))  - c14.*y(36));
-dy(37) = (d1.*y(39).^2.*(g05ht - y(37)) - d2.*y(38).*y(37));
-dy(38) = (d3.*y(37).^2.*(t05ht - y(38))  - d4.*y(38));
-dy(39) = (d5.*y(9).*(b05ht - y(39))  - d6.*y(39));
-dy(40) = VHTLg(y(31)) - (1 + b12*mc_activation(t, mc_switch, mc_start_time))*VHTDCg(y(40)) - b9.*y(40) + b10.*y(41);
-dy(41) = b9.*y(40) - b10.*y(41) - b11 .* y(41);
+dy(27) = inhibsynHAtoHA(y(35), gstar_ha_basal) .* VHTDC(y(33))  - VMATH(y(27),y(28)) - VMATH(y(27), y(29)) -  VHNMT(y(27)) - b1*(y(27) - y(30)) + VHAT(y(30));
+dy(28) = VMATH(y(27),y(28)) - fireha(t, inhibRHAtoHA(y(35), gstar_ha_basal).*inhibR5HTtoHA(y(38), gstar_5ht_basal)).*b2.*y(28) + b13 .* vha_trafficking(y(28), vha_basal);
+dy(29) = VMATH(y(27), y(29)) - b13 .* vha_trafficking(y(28), vha_basal); 
+dy(30) = fireha(t, inhibRHAtoHA(y(35), gstar_ha_basal).*inhibR5HTtoHA(y(38), gstar_5ht_basal)).*b2.*y(28) - VHAT(y(30)) + b3.*(y(31) - y(30)) + b1.*(y(27) - y(30)) - H1ha(y(30)).*VHATg(y(30)) - b4.*y(30) - mc_activation(t, mc_switch, mc_start_time) .* VHATmc(y(30)) + inhibRHAtoHA(y(47), gstar_ha_basal).*degran_ha_mc(mc_activation(t, mc_switch, mc_start_time));
+dy(31) = H1ha(y(30)).*VHATg(y(30)) - b3.*(y(31) - y(30)) - VHNMTg(y(31)) + (1 + b12*mc_activation(t, mc_switch, mc_start_time))*VHTDCg(y(41));
+dy(32) = HTin(t) - VHTL(y(32)) - VHTLg(y(32)) - b5.*(y(32) - bht0) - mc_activation(t, mc_switch, mc_start_time).*VHTLmc(y(32)); 
+dy(33) = VHTL(y(32)) - inhibsynHAtoHA(y(35), gstar_ha_basal) .* VHTDC(y(33)) - b6.*y(33) + b7.*y(34);
+dy(34) = (b6.*y(33) - b7.*y(34) - b8.*y(34));
+dy(35)  = (c9.*y(37).^2.*(g0HH - y(35)) - c10.*y(36).*y(35));
+dy(36) = (c11.*y(35).^2.*(t0HH - y(36))  - c12.*y(36));
+dy(37) = (c13.*y(30).*(b0HH - y(37))  - c14.*y(37));
+dy(38) = (d1.*y(40).^2.*(g05ht - y(38)) - d2.*y(39).*y(38));
+dy(39) = (d3.*y(38).^2.*(t05ht - y(39))  - d4.*y(39));
+dy(40) = (d5.*y(9).*(b05ht - y(40))  - d6.*y(40));
+dy(41) = VHTLg(y(32)) - (1 + b12*mc_activation(t, mc_switch, mc_start_time))*VHTDCg(y(41)) - b9.*y(41) + b10.*y(42);
+dy(42) = b9.*y(41) - b10.*y(42) - b11 .* y(42);
 
 
 
 %% Mast Cell Model
-% y(42) = cht. 
-% y(43) = chtpool.
-% y(44) = cha. 
-% y(45) = vha. 
-% y(46) =  Gha*.
-% y(47) = Tha*.
-% y(48)  =  bound ha.
+% y(43) = cht. 
+% y(44) = chtpool.
+% y(45) = cha. 
+% y(46) = vha. 
+% y(47) =  Gha*.
+% y(48) = Tha*.
+% y(49)  =  bound ha.
 
 e1 = 1; %From cHT to HTpool.
 e2 = 1; %From HTpool to cHT. 
@@ -205,11 +209,11 @@ g0Hmc = 10;  %Total gstar for H3 on mast cell.
 t0Hmc = 10; %Total tstar for H3 on mast cell.
 b0Hmc = 10;  %Total H3 receptors on mast cell.
 
-dy(42) = mc_activation(t, mc_switch, mc_start_time).*VHTLmc(y(31)) - inhibsynHAtoHA(y(46), gstar_ha_basal).*VHTDCmc(y(42)) - e1.*(y(42)) + e2.*(y(43));
-dy(43) = e1.*(y(42)) - e2.*(y(43)) - e3.*(y(43));
-dy(44) = inhibsynHAtoHA(y(46), gstar_ha_basal).*VHTDCmc(y(42)) - VMATHmc(y(44), y(45)) - VHNMTmc(y(44)) + mc_activation(t, mc_switch, mc_start_time) .* VHATmc(y(29));
-dy(45) = VMATHmc(y(44), y(45)) - inhibRHAtoHA(y(46), gstar_ha_basal).*degran_ha_mc(mc_activation(t, mc_switch, mc_start_time));
-dy(46) = e4.*y(48).^2.*(g0Hmc - y(46)) - e5.*y(47).*y(46);
-dy(47) = (e6.*y(46).^2.*(t0Hmc - y(47))  - e7.*y(47));
-dy(48) = (e8.*y(29).*(b0Hmc - y(48)) - e9.*y(48));
+dy(43) = mc_activation(t, mc_switch, mc_start_time).*VHTLmc(y(32)) - inhibsynHAtoHA(y(47), gstar_ha_basal).*VHTDCmc(y(43)) - e1.*(y(43)) + e2.*(y(44));
+dy(44) = e1.*(y(43)) - e2.*(y(44)) - e3.*(y(44));
+dy(45) = inhibsynHAtoHA(y(47), gstar_ha_basal).*VHTDCmc(y(43)) - VMATHmc(y(45), y(46)) - VHNMTmc(y(45)) + mc_activation(t, mc_switch, mc_start_time) .* VHATmc(y(30));
+dy(46) = VMATHmc(y(45), y(46)) - inhibRHAtoHA(y(47), gstar_ha_basal).*degran_ha_mc(mc_activation(t, mc_switch, mc_start_time));
+dy(47) = e4.*y(49).^2.*(g0Hmc - y(47)) - e5.*y(48).*y(47);
+dy(48) = (e6.*y(47).^2.*(t0Hmc - y(48))  - e7.*y(48));
+dy(49) = (e8.*y(30).*(b0Hmc - y(49)) - e9.*y(49));
 end

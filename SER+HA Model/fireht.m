@@ -12,7 +12,7 @@ t_end = 15;
 basal = 1;
 b = 2;
 max_f = 1.5;
-stim_boolean = 0;
+stim_boolean = 1;
 
 if stim_boolean == 0
     for i=1:n
