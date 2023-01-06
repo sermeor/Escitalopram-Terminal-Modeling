@@ -3,17 +3,18 @@ close all;
 clear all;
 
 %% Parameters for computation
-t_factor = 1; % Time factor for graphs.
-time = 100/t_factor; % Time of simulation depending on t_factor.
-sampling_rate = 10*t_factor; % number of samples per time factor units.
+t_factor = 3600; % Time factor for graphs.
+time = 2*3600/t_factor; % Time of simulation depending on t_factor.
+sampling_rate = 100*t_factor; % number of samples per time factor units.
 time_array = linspace(0, time, time * sampling_rate + 1);
 
 %% Compartmental Model of Escitalopram parameters.
 %Dose parameters. 
 weight = 20;                            % Mouse weight in g
-dose_factor = 10;                        %mg/kg of body weight. 
-SSRI_start_time = 1/t_factor;           % Starting time of SSRI dose in same units as t_factor.
+dose_factor = 1;                        %mg/kg of body weight. 
+SSRI_start_time = 1*3600/t_factor;           % Starting time of SSRI dose in same units as t_factor.
 dose = (dose_factor*1e6)*(weight/1000) * 0.001; % In ug. 
+SSRI_repeat_time = 10000*3600/t_factor; %Time for repeat of dose. 
 
 
 volume_factor = 5;                                                      % ml/kg of body weight.
@@ -23,7 +24,7 @@ bioavailability = 0.8;
 IP_volume = 2; % in ml.
 plasma_volume = 2; %in ml.
 brain_volume = 0.41; % in ml.
-peripheral_volume = 25; % in ml
+peripheral_volume = 25; % in ml.
 
 % Volumes in mL.
 v0 = IP_volume+volume_injection;
@@ -48,9 +49,7 @@ vht_basal = 63.0457; % vesicular 5ht.
 
 
 %% Model Solving. 
-[T,Y] = ode15s(@msc, time_array, [95.9766 0.0993	0.9007	20.166	1.6065	0.0367	63.0457 300	0.0593	1.6028	113.4370 0.8573	0.9931	0.9650	0.0014	0.7221	1.3593	1.0084	0.2500 1.0037 	0.2463	0	dose*bioavailability	0	0	0	3.1968	140.3708	1.4717	2.0490	99.7316	247.6260	309.5325	0.7221	1.3593	1.00584	0.8573	0.9931	0.9650	354.6656	177.3328	350	150	3	140	0.7205	1.3539	1.0051],[], molecular_weight, v2, SSRI_start_time, mc_switch, mc_start_time, btrp0, eht_basal, gstar_5ht_basal, gstar_ha_basal, bht0, vht_basal);
-
-
+[T,Y] = ode45(@msc, time_array, [95.9766 0.0993	0.9007	20.166	1.6065	0.0367	63.0457 300	0.0593	1.6028	113.4370 0.8573	0.9931	0.9650	0.0014	0.7221	1.3593	1.0084	0.2500 1.0037 	0.2463	0	0	0	0	0	3.1968	140.3708	1.4717	2.0490	99.7316	247.6260	309.5325	0.7221	1.3593	1.00584	0.8573	0.9931	0.9650	354.6656	177.3328	350	150	3	140	0.7205	1.3539	1.0051],[], molecular_weight, v2, SSRI_start_time, SSRI_repeat_time, dose*bioavailability, mc_switch, mc_start_time, btrp0, eht_basal, gstar_5ht_basal, gstar_ha_basal, bht0, vht_basal);
 
 %% Extracting and calculating parameters. 
 %Getting the ssri array in concentration.
@@ -72,7 +71,7 @@ xlabel('Time');
 ylabel('fire');
 
 figure;
-plot(T.*t_factor, ssri_array,'LineWidth',3);
+plot(T.*t_factor, ssri_array.*1000,'LineWidth',3);
 leg1 = legend('escit');
 set(leg1,'FontSize',14);
 xlabel('Time');

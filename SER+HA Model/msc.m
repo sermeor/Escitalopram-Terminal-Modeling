@@ -1,5 +1,5 @@
 %% Function with the system of differential equations for 5-HT+HA varicosities.
-function dy=msc(t, y, molecular_weight, v2, SSRI_start_time, mc_switch, mc_start_time, btrp0, eht_basal, gstar_5ht_basal, gstar_ha_basal, bht0,vht_basal)
+function dy=msc(t, y, molecular_weight, v2, SSRI_start_time, SSRI_repeat_time, q_inj, mc_switch, mc_start_time, btrp0, eht_basal, gstar_5ht_basal, gstar_ha_basal, bht0,vht_basal)
 dy=zeros(48,1);
 
 %% Pharmacokinetic model
@@ -11,21 +11,20 @@ k21p = (1)*2910;
 k13p = (1)*6;
 k31p = (1)*0.6;
 
-
 %Parameters.
 protein_binding = 0.56;
-sert_binding = 0.15;
+protein_brain_binding = 0.15;
 
 
-q0 = y(23).*start_SSRI(t, SSRI_start_time); %Peritoneum concentration in ug.
+q0 = y(23); %Peritoneum concentration in ug.
 q1 = y(24); %Blood concentration in ug.
 q2 = y(25); %Brain concentration in ug.
 q3 = y(26); %Periphery concentration in ug. 
 
 % Diff. equations. 
-dy(23) = - k01p*(q0);
-dy(24) = k01p*(q0) - (k10p + k12p)*(q1*(1-protein_binding)) + k21p*(q2*(1-sert_binding)) - k13p*(q1*(1-protein_binding)) + k31p*(q3);
-dy(25) = k12p*(q1*(1-protein_binding)) - k21p*(q2*(1-sert_binding));
+dy(23) = SSRI_inj(t, SSRI_start_time, SSRI_repeat_time, q_inj) - k01p*(q0);
+dy(24) = k01p*(q0) - (k10p + k12p)*(q1*(1-protein_binding)) + k21p*(q2*(1-protein_brain_binding)) - k13p*(q1*(1-protein_binding)) + k31p*(q3);
+dy(25) = k12p*(q1*(1-protein_binding)) - k21p*(q2*(1-protein_brain_binding));
 dy(26) = k13p*(q1*(1-protein_binding)) - k31p*(q3);
 
 % End of pharmacokinetic model
@@ -100,10 +99,10 @@ dy(2) = inhibsyn5HTto5HT(y(12), gstar_5ht_basal).*VTPH(y(4),y(3)) - VDRR(y(2), N
 dy(3) = VDRR(y(2),NADPH,y(3),NADP) - inhibsyn5HTto5HT(y(12), gstar_5ht_basal).*VTPH(y(4),y(3));
 dy(4) = VTRPin(y(1)) - inhibsyn5HTto5HT(y(12), gstar_5ht_basal).*VTPH(y(4),y(3)) - VPOOL(y(4),y(11)) - a19*y(4);
 dy(5) = inhibsyn5HTto5HT(y(12), gstar_5ht_basal).*VTPH(y(4),y(3)) - VAADC(y(5));
-dy(6) = VAADC(y(5)) - a24.*VMAT(y(6),y(7)) + a25.*VSERT(y(9), y(20), ssri) - TCcatab(y(6)) - a15.*(y(6) - y(9));
+dy(6) = VAADC(y(5)) - a24.*VMAT(y(6),y(7)) + a25.*VSERT(y(9), y(20), ssri, allo_ssri_ki(ssri)) - TCcatab(y(6)) - a15.*(y(6) - y(9));
 dy(7) = a24.*VMAT(y(6),y(7)) - a23.*fireht(t, inhibR5HTto5HT(y(12), gstar_5ht_basal).*inhibRHAto5HT(y(16), gstar_ha_basal)).*y(7) + vht_trafficking(y(7), vht_basal);
 dy(8) = a24.*VMAT(y(6),y(8)) - a22.*vht_trafficking(y(7), vht_basal);
-dy(9) = a23.*fireht(t, inhibR5HTto5HT(y(12), gstar_5ht_basal).*inhibRHAto5HT(y(16), gstar_ha_basal)).*y(7) - a25.*VSERT(y(9), y(20), ssri) - a18.*H1ht(y(9), eht_basal).*VUP2(y(9)) - a21.*y(9) + a15.*(y(6) - y(9)) + a16.*(y(15) - y(9));
+dy(9) = a23.*fireht(t, inhibR5HTto5HT(y(12), gstar_5ht_basal).*inhibRHAto5HT(y(16), gstar_ha_basal)).*y(7) - a25.*VSERT(y(9), y(20), ssri, allo_ssri_ki(ssri)) - a18.*H1ht(y(9), eht_basal).*VUP2(y(9)) - a21.*y(9) + a15.*(y(6) - y(9)) + a16.*(y(15) - y(9));
 dy(10) = TCcatab(y(6)) +  TCcatab(y(15)) - a17.*y(10);
 dy(11) = VPOOL(y(4),y(11)) - a20.*y(11);
 dy(12)  = (a9.*y(14).^2.*(g0 - y(12)) - a10.*y(13).*y(12));
