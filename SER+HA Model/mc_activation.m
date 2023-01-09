@@ -1,10 +1,10 @@
 %% Function of mast cell travel and activation in the brain.
 %mc_switch is the presence or lack of neuroinflammation,
 % mc_start is the time of start of neuroinflammation, t is time. 
-
+% 
 function f = mc_activation(t, mc_switch, mc_start_time)
 c = 1; %Amplitude of MC activation. 
-b = 12; %Strength of increase. 
+b = 20; %Strength of increase. 
 t1 = mc_start_time + log(999)/b; %Start time is 0.01% of sigmoid function.
 n=length(t);
 for i=1:n
@@ -16,7 +16,7 @@ for i=1:n
 end
 end
 
-% 
+
 % function f = mc_activation(t, mc_switch, mc_start_time) %Linear
 % b = 0.25; %Strength of increase. 
 % n=length(t);

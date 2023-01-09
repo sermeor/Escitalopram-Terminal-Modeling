@@ -15,7 +15,6 @@ k31p = (1)*0.6;
 protein_binding = 0.56;
 protein_brain_binding = 0.15;
 
-
 q0 = y(23); %Peritoneum concentration in ug.
 q1 = y(24); %Blood concentration in ug.
 q2 = y(25); %Brain concentration in ug.
@@ -129,7 +128,7 @@ b8 = 1; %Other uses of HT remove HT.
 b9 = 1;  %From gHT to gHTpool. 
 b10 = 1; %From gHTpool to gHT.  
 b11 = 1; %Removal of gHT or use somewhere else. 
-b12 = 200; %Factor of mast cell activation of glia histamine production. 
+b12 = 4*2.5; %Factor of activation of glia histamine production. 
 b13 = 1; % rate of vha_reserve moving to vha.
 
 c9 = 100; %Bound autoreceptors produceG∗. 
@@ -168,7 +167,7 @@ b05ht = 10; % total serotonin receptors in histamine varicosities.
 % y(41) = ght
 % y(42) = ghtpool
 
-dy(27) = inhibsynHAtoHA(y(35), gstar_ha_basal) .* VHTDC(y(33))  - VMATH(y(27),y(28)) - VMATH(y(27), y(29)) -  VHNMT(y(27)) - b1*(y(27) - y(30)) + VHAT(y(30));
+dy(27) = inhibsynHAtoHA(y(35), gstar_ha_basal) .* VHTDC(y(33))  - VMATH(y(27),y(28))  -  VHNMT(y(27)) - b1*(y(27) - y(30)) + VHAT(y(30)) - VMATH(y(27), y(29));
 dy(28) = VMATH(y(27),y(28)) - fireha(t, inhibRHAtoHA(y(35), gstar_ha_basal).*inhibR5HTtoHA(y(38), gstar_5ht_basal)).*b2.*y(28) + b13 .* vha_trafficking(y(28), vha_basal);
 dy(29) = VMATH(y(27), y(29)) - b13 .* vha_trafficking(y(28), vha_basal); 
 dy(30) = fireha(t, inhibRHAtoHA(y(35), gstar_ha_basal).*inhibR5HTtoHA(y(38), gstar_5ht_basal)).*b2.*y(28) - VHAT(y(30)) + b3.*(y(31) - y(30)) + b1.*(y(27) - y(30)) - H1ha(y(30)).*VHATg(y(30)) - b4.*y(30) - mc_activation(t, mc_switch, mc_start_time) .* VHATmc(y(30)) + inhibRHAtoHA(y(47), gstar_ha_basal).*degran_ha_mc(mc_activation(t, mc_switch, mc_start_time));
