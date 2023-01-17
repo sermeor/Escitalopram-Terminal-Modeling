@@ -1,8 +1,8 @@
 for i = 0:30
     %% Parameters for computation
     t_factor = 3600; % Time factor for graphs.
-    time = 4*3600/t_factor; % Time of simulation depending on t_factor.
-    sampling_rate = 10*t_factor; % number of samples per time factor units.
+    time = 20*3600/t_factor; % Time of simulation depending on t_factor.
+    sampling_rate = 1*t_factor; % number of samples per time factor units.
     time_array = linspace(0, time, time * sampling_rate + 1);
     
     %% Compartmental Model of Escitalopram parameters.
@@ -33,7 +33,7 @@ for i = 0:30
     
     %% Mast cell model of neuroinflammation. 
     mc_start_time = 0.5/t_factor; %Time to start neuroinflammation effects with mast cells.
-    mc_switch = 0; %Switch that turns on an off all effects of mast cell presence.
+    mc_switch = 1; %Switch that turns on an off all effects of mast cell presence.
     
     %% Basal parameters. 
     btrp0 = 96; %Blood tryptophan equilibrium value. 

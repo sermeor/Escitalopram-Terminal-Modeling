@@ -11,7 +11,10 @@ for i=1:n
     if mc_switch == 0
         f(i) = 0;
     else
-        f(i) = c/(1 + exp(-b * (t(i) - t1)));
+        if t < mc_start_time
+            f(i) = 0.001;
+        else
+            f(i) = c/(1 + exp(-b * (t(i) - t1)));
     end
 end
 end

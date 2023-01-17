@@ -5,7 +5,7 @@
 function f = fireht(t, i_factor) %Repeated stim. 
 n=length(t);
 r = 10; 
-repeat_time = 60*5;
+repeat_time = 60*10;
 t_start = 5;
 t_flip = 7; 
 t_end = 15;

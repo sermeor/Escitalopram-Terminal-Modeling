@@ -5,7 +5,6 @@
 function a = VHTL(b)
 km = 1000;  % (lobster)(6.2-19 muM conrad05)
 k1 = 4680;
-
 a = (1).*k1.*(b./(km + b));
 
 end
