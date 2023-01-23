@@ -4,7 +4,7 @@
 %UNITS in uM and uM/h. 
 function a = VAADC(b)
 km  = 160; 
-vmax = (1)*400;  %Vmax (vitamin B6 is a cofactor and will affect Vmax)
+vmax = 400;  %Vmax (vitamin B6 is a cofactor and will affect Vmax)
 
 a = vmax.*b./(km + b);
 

@@ -10,8 +10,8 @@ t_start = 5;
 t_flip = 7; 
 t_end = 15;
 basal = 1;
-b = 2;
-max_f = 1.5;
+b = 2; 
+max_f = 1.5; 
 stim_boolean = 0;
 
 if stim_boolean == 0

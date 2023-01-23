@@ -6,7 +6,7 @@ max_r = 100;
 min_r = 0;
 s = 15; %Strength
 diff = vht_basal - vht; %Difference respect to basal. 
-ratio = s*diff;
+ratio = s.*diff;
 ratio(ratio>max_r) = max_r; 
 ratio(ratio<min_r) = min_r; 
 end

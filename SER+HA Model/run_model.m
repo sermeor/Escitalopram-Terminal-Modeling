@@ -1,17 +1,17 @@
 %% Full script with compartmental model and Serotonin Terminal Model.
 close all;
-%clear all;
+clear all;
 
 %% Parameters for computation
 t_factor = 3600; % Time factor for graphs.
-time = 2*3600/t_factor; % Time of simulation depending on t_factor.
-sampling_rate = 10*t_factor; % number of samples per time factor units.
+time = 30/t_factor; % Time of simulation depending on t_factor.
+sampling_rate = 100*t_factor; % number of samples per time factor units.
 time_array = linspace(0, time, time * sampling_rate + 1);
 
 %% Compartmental Model of Escitalopram parameters.
 %Dose parameters. 
 weight = 20;                            % Mouse weight in g
-dose_factor = 10;                        %mg/kg of body weight. 
+dose_factor = 0;                       % mg/kg of body weight. 
 SSRI_start_time = 1*3600/t_factor;           % Starting time of SSRI dose in same units as t_factor.
 dose = (dose_factor*1e6)*(weight/1000) * 0.001; % In ug. 
 SSRI_repeat_time = 10000*3600/t_factor; %Time for repeat of dose. 
@@ -37,7 +37,7 @@ molecular_weight = 324.392; % g/mol, or ug/umol.
 
 %% Mast cell model of neuroinflammation. 
 mc_start_time = 0.5*3600/t_factor; %Time to start neuroinflammation effects with mast cells.
-mc_switch = 1; %Switch that turns on an off all effects of mast cell presence.
+mc_switch = 0; %Switch that turns on an off all effects of mast cell presence.
 
 %% Basal parameters. 
 btrp0 = 96; %Blood tryptophan equilibrium value. 

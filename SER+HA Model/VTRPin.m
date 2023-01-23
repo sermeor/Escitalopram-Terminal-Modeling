@@ -2,7 +2,7 @@
 % b = btyr
 %UNITS IN uM and uM/h. 
 function a = VTRPin(b)
-vmax = (1)*700;   % Vmax 
+vmax = 700;   % Vmax 
 km = 330;  % Kilberg p. 169  (effective Km because of other AA)    
 a = vmax.*b./(km + b); 
 

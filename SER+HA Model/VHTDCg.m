@@ -6,6 +6,6 @@ function a = VHTDCg(b)
 % b = cht
 %  c = G*
 km = 270;  %homosapiens BRENDA  (other wild type =100, Komori2012)
-v = 0.35*175.50;
+v = 61.4250;
 a =  v.*(b./(km + b)); 
 

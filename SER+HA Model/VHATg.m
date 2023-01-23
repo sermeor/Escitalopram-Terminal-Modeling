@@ -3,6 +3,6 @@
 % b = eha
 function a = VHATg(b)
 k = 10; 
-V = (1)*(2.5)*(90)*60;
+V = 13500;
 a = (V.*b./(k + b));
 end

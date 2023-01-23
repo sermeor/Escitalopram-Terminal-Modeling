@@ -3,14 +3,14 @@
 % 
 function f = fireha(t, i_factor) %Repeated stim. 
 n=length(t);
-r = 2; 
+r = 150;  
 repeat_time = 60*10;
 t_start = 5;
-t_flip = 7; 
+t_flip = 7;
 t_end = 15;
 basal = 1;
-b = 2;
-max_f = 2;
+b = 2; 
+max_f = 10; 
 stim_boolean = 0;
 
 if stim_boolean == 0

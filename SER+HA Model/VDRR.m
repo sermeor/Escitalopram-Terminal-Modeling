@@ -7,7 +7,7 @@
 function a = VDRR(b,c,d,e)
 k1 = 100;   %Km for BH2 (BRENDA) (6-650)
 k2 = 75;  %Km for NADPH (BRENDA, values 770,110,29) (schumber 70-80)
-V1 = (1)*(25)*200; % Vmax forward
+V1 = 5000; % Vmax forward
 k3 = 10;  %Km for BH4 (BRENDA) (1.1 to 17)
 k4 = 75;  %Km for NADP (BRENDA)(schumber 70-80)
 V2 = 3; % Vmax backward

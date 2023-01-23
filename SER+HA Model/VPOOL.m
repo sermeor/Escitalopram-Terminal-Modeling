@@ -4,7 +4,7 @@
 % UNITS IN uM and uM/h. 
 function a = VPOOL(b,c)
 k1 = 9; %to pool
-k2 = .6; %from pool
+k2 = 0.6; %from pool
  
 a = (k1.*b - k2.*c);
 

@@ -4,6 +4,7 @@
 % c = vha
 function a = VMATHmc(b, c)
 k = 24;         
-V =  (1)*21104; 
+V =  21104; 
 a = (V.*(b./(k + b)) - 5.*c);
+a(a<0) = 0; %Make sure a is not negative
 end

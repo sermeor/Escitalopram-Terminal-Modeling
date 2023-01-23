@@ -7,7 +7,7 @@ gdiff = g - gbasal;
 max_r = 2; % Max increase of speed.
 min_r = 0; %Min value of speed.
 b = 7.5; % Strength. 
-ratio = 1 + b * gdiff;
+ratio = 1 + b .* gdiff;
 ratio(ratio > max_r) = max_r;
 ratio(ratio < min_r) = min_r;
 end

@@ -4,6 +4,6 @@
 % Units in uM. 
 function a = inhibsynHAtoHA(b, c)
 min_a = 0;
-a = 1 - (0.1).*(b - c); %2.5
+a = 1 - (0.1).*(b - c);
 a(a<min_a) = min_a;
 end
