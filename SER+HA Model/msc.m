@@ -88,6 +88,7 @@ k_is = 0.75;
 % y(20) = SERTs_surface
 % y(21) = SERT_pool
 % y(22) = SERT inactive
+
 dy(1) = TRPin - VTRPin(y(1)) - a1.*(y(1) - btrp0); 
 dy(2) = inhibsyn5HTto5HT(y(12), gstar_5ht_basal).*VTPH(y(4),y(3)) - VDRR(y(2), NADPH, y(3), NADP); 
 dy(3) = VDRR(y(2),NADPH,y(3),NADP) - inhibsyn5HTto5HT(y(12), gstar_5ht_basal).*VTPH(y(4),y(3));

@@ -1,4 +1,4 @@
-%% Function of serotonin inhibition of histamine release.
+%% Function of serotonin activation of histamine release.
 % Dependent on Serotonin-activated g-protein (b) and the  equilibrium  value
 % of  the  activated  G-protein (c).
 % Units in uM. 
