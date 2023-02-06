@@ -1,29 +1,6 @@
 %% Function with the system of differential equations for 5-HT+HA varicosities.
-function dy=msc(t, y, molecular_weight, v2, SSRI_start_time, SSRI_repeat_time, q_inj, mc_switch, mc_start_time, btrp0, eht_basal, gstar_5ht_basal, gstar_ha_basal, bht0, vht_basal, vha_basal)
+function dy=msc(t, y, v2, ssri_molecular_weight, SSRI_start_time, SSRI_repeat_time, SSRI_q_inj, fmh_molecular_weight, FMH_start_time, FMH_repeat_time, FMH_q_inj, mc_switch, mc_start_time, btrp0, eht_basal, gstar_5ht_basal, gstar_ha_basal, bht0, vht_basal, vha_basal)
 dy=zeros(49,1);
-
-%% Pharmacokinetic model
-% Rates between comparments. 
-k01p = 0.6;
-k10p = 3;
-k12p = 9.9;
-k21p = 2910;
-k13p = 6;
-k31p = 0.6;
-
-%Parameters.
-protein_binding = 0.56;
-protein_brain_binding = 0.15;
-q0 = y(23); %Peritoneum concentration in ug.
-q1 = y(24); %Blood concentration in ug.
-q2 = y(25); %Brain concentration in ug.
-q3 = y(26); %Periphery concentration in ug. 
-
-% Diff. equations. 
-dy(23) = SSRI_inj(t, SSRI_start_time, SSRI_repeat_time, q_inj) - k01p*(q0);
-dy(24) = k01p*(q0) - (k10p + k12p)*(q1*(1-protein_binding)) + k21p*(q2*(1-protein_brain_binding)) - k13p*(q1*(1-protein_binding)) + k31p*(q3);
-dy(25) = k12p*(q1*(1-protein_binding)) - k21p*(q2*(1-protein_brain_binding));
-dy(26) = k13p*(q1*(1-protein_binding)) - k31p*(q3);
 
 %% Serotonin Terminal Model
 NADP = 26;  % NADP concentration in uM.
@@ -57,7 +34,7 @@ b0 = 10; % total serotonin autoreceptors.
 gh0 = 10; %total g-protein of histamine heteroreceptors. 
 th0 =  10;  %total T regulary protein of histamine heteroreceptors. 
 bh0 =  10; %total histamine heteroreceptors
-ssri = (q2/v2)*1000/(molecular_weight); % SSRI concentration from compartmental model in uM -> umol/L. 
+ssri = (y(25)/v2)*1000/(ssri_molecular_weight); % SSRI concentration from compartmental model in uM -> umol/L. 
 
 %Parameters for SERT membrane, inactivity and pool transport.
 k_ps = 10 .* k_5ht1ab_rel_ps(y(12), gstar_5ht_basal);
@@ -112,6 +89,30 @@ dy(20) = dy(19) - k_si .* y(20) + k_is .* y(22);
 dy(21) = k_sp .* y(19)  - k_ps .* y(21);
 dy(22) = k_si .* y(20)  - k_is .* y(22);
 
+
+%% Escitalopram pharmacokinetic model
+% Rates between comparments (h-1). 
+k01 = 0.6;
+k10 = 3;
+k12 = 9.9;
+k21 = 2910;
+k13 = 6;
+k31 = 0.6;
+
+%Parameters.
+protein_binding = 0.56;
+protein_brain_binding = 0.15;
+%y(23) = Peritoneum concentration in ug.
+%y(24) = Blood concentration in ug.
+%y(25) = Brain concentration in ug.
+%y(26) = Periphery concentration in ug. 
+
+% Diff. equations. 
+dy(23) = SSRI_inj(t, SSRI_start_time, SSRI_repeat_time, SSRI_q_inj) - k01*(y(23));
+dy(24) = k01*(y(23)) - (k10 + k12)*(y(24)*(1-protein_binding)) + k21*(y(25)*(1-protein_brain_binding)) - k13*(y(24)*(1-protein_binding)) + k31*(y(26));
+dy(25) = k12*(y(24)*(1-protein_binding)) - k21*(y(25)*(1-protein_brain_binding));
+dy(26) = k13*(y(24)*(1-protein_binding)) - k31*(y(26));
+
 %% Histamine Terminal Model. 
 b1 = 15;  %HA leakage from the cytosol to the extracellular space. 
 b2 = 3.5; %HA release per action potential. 
@@ -161,13 +162,13 @@ HTin = 636.5570; % Histidine input to blood histidine uM/h.
 % y(41) = ght
 % y(42) = ghtpool
 
-dy(27) = inhibsynHAtoHA(y(35), gstar_ha_basal) .* VHTDC(y(33))  - VMATH(y(27),y(28))  -  VHNMT(y(27)) - b1*(y(27) - y(30)) + VHAT(y(30)) - VMATH(y(27), y(29));
+dy(27) = inhibsynHAtoHA(y(35), gstar_ha_basal) .* y(54) .*VHTDC(y(33))  - VMATH(y(27),y(28))  -  VHNMT(y(27)) - b1*(y(27) - y(30)) + VHAT(y(30)) - VMATH(y(27), y(29));
 dy(28) = VMATH(y(27),y(28)) - fireha(t, inhibRHAtoHA(y(35), gstar_ha_basal).*activR5HTtoHA(y(38), gstar_5ht_basal)).*b2.*y(28) + vha_trafficking(y(28), vha_basal);
 dy(29) = VMATH(y(27), y(29)) - vha_trafficking(y(28), vha_basal); 
-dy(30) = fireha(t, inhibRHAtoHA(y(35), gstar_ha_basal).*activR5HTtoHA(y(38), gstar_5ht_basal)).*b2.*y(28) - VHAT(y(30)) + b3.*(y(31) - y(30)) + b1.*(y(27) - y(30)) - H1ha(y(30)).*VHATg(y(30)) - b4.*y(30) - mc_activation(t, mc_switch, mc_start_time) .* VHATmc(y(30)) + inhibRHAtoHA(y(47), gstar_ha_basal).*degran_ha_mc(mc_activation(t, mc_switch, mc_start_time));
-dy(31) = H1ha(y(30)).*VHATg(y(30)) - b3.*(y(31) - y(30)) - VHNMTg(y(31)) + (1 + b12*mc_activation(t, mc_switch, mc_start_time))*VHTDCg(y(41));
+dy(30) = fireha(t, inhibRHAtoHA(y(35), gstar_ha_basal).*activR5HTtoHA(y(38), gstar_5ht_basal)).*b2.*y(28) - VHAT(y(30)) + b3.*(y(31) - y(30)) + b1.*(y(27) - y(30)) - H1ha(y(30)).*VHATg(y(30)) - b4.*y(30) - mc_activation(t, mc_switch, mc_start_time) .* VHATmc(y(30)) + inhibRHAtoHA(y(47), gstar_ha_basal).*degran_ha_mc(mc_activation(t, mc_switch, mc_start_time)).*y(46);
+dy(31) = H1ha(y(30)).*VHATg(y(30)) - b3.*(y(31) - y(30)) - VHNMTg(y(31)) + (1 + b12*mc_activation(t, mc_switch, mc_start_time))* y(54) .*VHTDCg(y(41));
 dy(32) = HTin - VHTL(y(32)) - VHTLg(y(32)) - b5.*(y(32) - bht0) - mc_activation(t, mc_switch, mc_start_time).*VHTLmc(y(32)); 
-dy(33) = VHTL(y(32)) - inhibsynHAtoHA(y(35), gstar_ha_basal) .* VHTDC(y(33)) - b6.*y(33) + b7.*y(34);
+dy(33) = VHTL(y(32)) - inhibsynHAtoHA(y(35), gstar_ha_basal) .* y(54) .*VHTDC(y(33)) - b6.*y(33) + b7.*y(34);
 dy(34) = (b6.*y(33) - b7.*y(34) - b8.*y(34));
 dy(35)  = (b13.*y(37).^2.*(g0HH - y(35)) - b14.*y(36).*y(35));
 dy(36) = (b15.*y(35).^2.*(t0HH - y(36))  - b16.*y(36));
@@ -175,7 +176,7 @@ dy(37) = (b17.*y(30).*(b0HH - y(37))  - b18.*y(37));
 dy(38) = (b19.*y(40).^2.*(g05ht - y(38)) - b20.*y(39).*y(38));
 dy(39) = (b21.*y(38).^2.*(t05ht - y(39))  - b22.*y(39));
 dy(40) = (b23.*y(9).*(b05ht - y(40))  - b24.*y(40));
-dy(41) = VHTLg(y(32)) - (1 + b12*mc_activation(t, mc_switch, mc_start_time))*VHTDCg(y(41)) - b9.*y(41) + b10.*y(42);
+dy(41) = VHTLg(y(32)) - (1 + b12*mc_activation(t, mc_switch, mc_start_time))* y(54) .*VHTDCg(y(41)) - b9.*y(41) + b10.*y(42);
 dy(42) = b9.*y(41) - b10.*y(42) - b11 .* y(42);
 
 %% Mast Cell Model
@@ -200,11 +201,38 @@ g0Hmc = 10;  %Total gstar for H3 on mast cell.
 t0Hmc = 10; %Total tstar for H3 on mast cell.
 b0Hmc = 10;  %Total H3 receptors on mast cell.
 
-dy(43) = mc_activation(t, mc_switch, mc_start_time).*VHTLmc(y(32)) - inhibsynHAtoHA(y(47), gstar_ha_basal).*VHTDCmc(y(43)) - c1.*(y(43)) + c2.*(y(44));
+dy(43) = mc_activation(t, mc_switch, mc_start_time).*VHTLmc(y(32)) - inhibsynHAtoHA(y(47), gstar_ha_basal).*y(54) .*VHTDCmc(y(43)) - c1.*(y(43)) + c2.*(y(44));
 dy(44) = c1.*(y(43)) - c2.*(y(44)) - c3.*(y(44));
-dy(45) = inhibsynHAtoHA(y(47), gstar_ha_basal).*VHTDCmc(y(43)) - VMATHmc(y(45), y(46)) - VHNMTmc(y(45)) + mc_activation(t, mc_switch, mc_start_time) .* VHATmc(y(30));
-dy(46) = VMATHmc(y(45), y(46)) - inhibRHAtoHA(y(47), gstar_ha_basal).*degran_ha_mc(mc_activation(t, mc_switch, mc_start_time));
+dy(45) = inhibsynHAtoHA(y(47), gstar_ha_basal).*y(54).*VHTDCmc(y(43)) - VMATHmc(y(45), y(46)) - VHNMTmc(y(45)) + mc_activation(t, mc_switch, mc_start_time) .* VHATmc(y(30));
+dy(46) = VMATHmc(y(45), y(46)) - inhibRHAtoHA(y(47), gstar_ha_basal).*degran_ha_mc(mc_activation(t, mc_switch, mc_start_time)).*y(46);
 dy(47) = c4.*y(49).^2.*(g0Hmc - y(47)) - c5.*y(48).*y(47);
 dy(48) = (c6.*y(47).^2.*(t0Hmc - y(48))  - c7.*y(48));
 dy(49) = (c8.*y(30).*(b0Hmc - y(49)) - c9.*y(49));
+
+%% FMH Pharmacokinetics Model
+% Rates between comparments (h-1). 
+k01f = 3.75;
+k10f = 1.75;
+k12f = 0.1875;
+k21f = 3.5;
+k13f = 5;
+k31f = 1.5;
+
+%Parameters.
+protein_binding_fmh = 0.60;
+protein_brain_binding_fmh = 0.15;
+fmh = (y(52)/v2)*1000/(fmh_molecular_weight); % Concentration of FMH in uM -> umol/L. 
+%y(50) = Peritoneum concentration in ug.
+%y(51) = Blood concentration in ug.
+%y(52) = Brain concentration in ug.
+%y(53) = Periphery concentration in ug. 
+%y(54) = Ratio of active HTDC in cytosol of histamine, glia and mast cells.
+
+% Diff. equations.
+dy(50) = FMH_inj(t, FMH_start_time, FMH_repeat_time, FMH_q_inj) - k01f*(y(50));
+dy(51) = k01f*(y(50)) - (k10f + k12f)*(y(51)*(1-protein_binding_fmh)) + k21f*(y(52)*(1-protein_brain_binding_fmh)) - k13f*(y(51)*(1-protein_binding_fmh)) + k31f*(y(53));
+dy(52) = k12f*(y(51)*(1-protein_binding_fmh)) - k21f*(y(52)*(1-protein_brain_binding_fmh));
+dy(53) = k13f*(y(51)*(1-protein_binding_fmh)) - k31f*(y(53));
+dy(54) = - k_fmh_inh(fmh)*y(54) + HTDCin(y(54));
+
 end
