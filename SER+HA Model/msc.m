@@ -1,5 +1,5 @@
 %% Function with the system of differential equations for 5-HT+HA varicosities.
-function dy=msc(t, y, v2, ssri_molecular_weight, SSRI_start_time, SSRI_repeat_time, SSRI_q_inj, fmh_molecular_weight, FMH_start_time, FMH_repeat_time, FMH_q_inj, mc_switch, mc_start_time, btrp0, eht_basal, gstar_5ht_basal, gstar_ha_basal, bht0, vht_basal, vha_basal)
+function dy=msc(t, y, v2, ssri_molecular_weight, SSRI_start_time, SSRI_repeat_time, SSRI_q_inj, fmh_molecular_weight, FMH_start_time, FMH_repeat_time, FMH_q_inj, mc_switch, mc_start_time, btrp0, eht_basal, gstar_5ht_basal, gstar_ha_basal, bht0, vht_basal, vha_basal, eha_basal)
 dy=zeros(51,1);
 
 %% Serotonin Terminal Model
@@ -67,105 +67,26 @@ k_is = 0.75;
 % y(22) = SERT inactive
 
 dy(1) = TRPin - VTRPin(y(1)) - a1.*(y(1) - btrp0);
-
-
-
-
 dy(2) = inhibsyn5HTto5HT(y(12), gstar_5ht_basal).*VTPH(y(4),y(3)) - VDRR(y(2), NADPH, y(3), NADP); 
-
-
-
 dy(3) = VDRR(y(2),NADPH,y(3),NADP) - inhibsyn5HTto5HT(y(12), gstar_5ht_basal).*VTPH(y(4),y(3));
-
-
-
 dy(4) = VTRPin(y(1)) - inhibsyn5HTto5HT(y(12), gstar_5ht_basal).*VTPH(y(4),y(3)) - VPOOL(y(4),y(11)) - a12*y(4);
-
-
-
-
-
-
-
 dy(5) = inhibsyn5HTto5HT(y(12), gstar_5ht_basal).*VTPH(y(4),y(3)) - VAADC(y(5));
-
-
-
-
-
 dy(6) = VAADC(y(5)) - VMAT(y(6), y(7)) - VMAT(y(6),y(8)) + VSERT(y(9), y(20), ssri, allo_ssri_ki(ssri)) - TCcatab(y(6)) - a15.*(y(6) - y(9));
-
-
-
-
-
-
 dy(7) = VMAT(y(6),y(7)) - a16.*fireht(t, inhibR5HTto5HT(y(12), gstar_5ht_basal).*inhibRHAto5HT(y(16), gstar_ha_basal)).*y(7) + vht_trafficking(y(7), vht_basal);
-
-
-
-
-
-
-
-
-
 dy(8) = VMAT(y(6),y(8)) - a15.*vht_trafficking(y(7), vht_basal);
-
-
-
-
 dy(9) = a16.*fireht(t, inhibR5HTto5HT(y(12), gstar_5ht_basal).*inhibRHAto5HT(y(16), gstar_ha_basal)).*y(7) - VSERT(y(9), y(20), ssri, allo_ssri_ki(ssri)) - a11.*H1ht(y(9), eht_basal).*VUP2(y(9)) - a14.*y(9) + a8.*(y(6) - y(9)) + a9.*(y(15) - y(9));
-
-
-
-
-
-
 dy(10) = TCcatab(y(6)) +  TCcatab(y(15)) - a10.*y(10);
-
-
-
 dy(11) = VPOOL(y(4),y(11)) - a13.*y(11);
-
-
-
-
 dy(12)  = (a2.*y(14).^2.*(g0 - y(12)) - a3.*y(13).*y(12));
-
-
-
 dy(13) = (a4.*y(12).^2.*(t0 - y(13))  - a5.*y(13));
-
-
-
 dy(14) = (a6.*y(9).*(b0 - y(14))  - a7.*y(14));
-
-
-
 dy(15) = a11*H1ht(y(9), eht_basal).*VUP2(y(9))  - TCcatab(y(15)) - a9.*(y(15) - y(9));
-
-
 dy(16) = (a17.*y(18).^2.*(gh0 - y(16)) - a18.*y(17).*y(16));
-
-
-
-
 dy(17) = (a19.*y(16).^2.*(th0 - y(17))  - a20.*y(17));
-
-
 dy(18) = (a21.*y(30).*(bh0 - y(18))  - a22.*y(18));
-
-
 dy(19) = k_ps .* y(21) - k_sp .*y(19);
-
-
 dy(20) = dy(19) - k_si .* y(20) + k_is .* y(22);
-
-
 dy(21) = k_sp .* y(19)  - k_ps .* y(21);
-
-
 dy(22) = k_si .* y(20)  - k_is .* y(22);
 
 %% Escitalopram pharmacokinetic model
@@ -195,7 +116,7 @@ dy(26) = k13*(y(24)*(1-protein_binding)) - k31*(y(26));
 b1 = 15;  %HA leakage from the cytosol to the extracellular space. 
 b2 = 3.5; %HA release per action potential. 
 b3 = 15; %HA leakage from glia to the extracellular space.
-b4 = 0.05; %HA removal from the extracellular space
+b4 = 0.05; %HA removal from the extracellular space.
 b5 = 0.25;  %Strength of stabilization of blood HT near 100μM. 
 b6 = 2.5; %From cHT to HTpool.
 b7 = 1; %From HTpool to cHT. 
@@ -244,7 +165,7 @@ dy(27) = inhibsynHAtoHA(y(35), gstar_ha_basal) .* y(51) .*VHTDC(y(33))  - VMATH(
 dy(28) = VMATH(y(27),y(28)) - b2.*fireha(t, inhibRHAtoHA(y(35), gstar_ha_basal).*activR5HTtoHA(y(38), gstar_5ht_basal)).*y(28) + vha_trafficking(y(28), vha_basal);
 dy(29) = VMATH(y(27), y(29)) - vha_trafficking(y(28), vha_basal); 
 dy(30) = b2.*fireha(t, inhibRHAtoHA(y(35), gstar_ha_basal).*activR5HTtoHA(y(38), gstar_5ht_basal)).*y(28) - VHAT(y(30)) + b3.*(y(31) - y(30)) + b1.*(y(27) - y(30)) - H1ha(y(30)).*VHATg(y(30)) - b4.*y(30) - mc_activation(t, mc_switch, mc_start_time) .* VHATmc(y(30)) + degran_ha_mc(mc_activation(t, mc_switch, mc_start_time)).*y(46);
-dy(31) = H1ha(y(30)).*VHATg(y(30)) - b3.*(y(31) - y(30)) - VHNMTg(y(31)) + (1 + b12*mc_activation(t, mc_switch, mc_start_time))* y(51) .*VHTDCg(y(41));
+dy(31) = H1ha(y(30)).*VHATg(y(30)) - b3.*(y(31) - y(30)) - VHNMTg(y(31)) + (1 + b12*mc_activation(t, mc_switch, mc_start_time)) * y(51) .*VHTDCg(y(41));
 dy(32) = HTin - VHTL(y(32)) - VHTLg(y(32)) - b5.*(y(32) - bht0) - mc_activation(t, mc_switch, mc_start_time).*VHTLmc(y(32)); 
 dy(33) = VHTL(y(32)) - inhibsynHAtoHA(y(35), gstar_ha_basal) .* y(51) .*VHTDC(y(33)) - b6.*y(33) + b7.*y(34);
 dy(34) = (b6.*y(33) - b7.*y(34) - b8.*y(34));
